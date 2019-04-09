@@ -10,14 +10,11 @@ document.addEventListener("DOMContentLoaded", () => {
   };
   // Initialize Firebase App
   firebase.initializeApp(config);
+  const dataRef = firebase.database();
   // Set form DOM into a variable
   const form = document.querySelector("form");
-  // addTrain function
-  const addTrain = () => {
-    // #trainName
-    // #destination
-    // #firstTrainTime
-    // #frequency
+  // Add train to DB
+  const addTrainToDB = () => {
     const train = document.querySelector("#trainName").value.trim();
     const destination = document.querySelector("#destination").value.trim();
     const firstTrainTime = document.querySelector("#firstTrainTime").value.trim();
@@ -28,16 +25,24 @@ document.addEventListener("DOMContentLoaded", () => {
       return false;
     // Otherwise, add to Firebase DB 
     } else {
-      console.log(train, destination, firstTrainTime, frequency);
-      // setTimeout(() => {
-      //   form.reset();
-      // }, 500);
+      dataRef.ref().push({
+        train,
+        destination,
+        firstTrainTime,
+        frequency,
+        dateAdded: firebase.database.ServerValue.TIMESTAMP
+      });
+      // console.log(train, destination, firstTrainTime, frequency);
+      setTimeout(() => {
+        form.reset();
+      }, 250);
     }
   }
-  // addToDB function
-  const addToDB = () => {
 
-  }
+  dataRef.ref().on("child_added", (childSnapshot) => {
+    
+  })
+
   // loadSampleData function
   // Make it easy to test the app
   const trains = ["Snowpiercer", "Polar Express", "Thomas The Train", "BART", "Orient Express"];
@@ -62,5 +67,5 @@ document.addEventListener("DOMContentLoaded", () => {
   // On click handler for #btn-addTrain
   // Also works when user hits Enter/Return
   // because of button type="submit"
-  document.querySelector("#btn-addTrain").addEventListener("click", addTrain);
+  document.querySelector("#btn-addTrain").addEventListener("click", addTrainToDB);
 });
