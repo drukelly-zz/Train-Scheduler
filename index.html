@@ -27,22 +27,23 @@
     <section class="b--black-10 ba br3 center mb4">
       <h1 class="bg-near-white black-60 br--top br3 f4 mv0 ph3 pv3"><span class="f2 mr1 v-mid">⏱</span> Current Train Schedule</h1>
       <div class="b--black-10 bt pa3">
-        <table class="collapse ph3 pv2 w-100">
+        <table class="b--black-10 ba collapse ph3 pv2 w-100">
           <thead class="striped--light-gray">
             <th class="f6 fw6 ph3 pv2 tl ttu">Train Name</th>
-            <th class="f6 fw6 ph3 pv2 tl ttu">Destination</th>
+            <th class="f6 fw6 ph3 pv2 tc ttu">Destination</th>
             <th class="f6 fw6 ph3 pv2 tc ttu">Frequency (min)</th>
             <th class="f6 fw6 ph3 pv2 tc ttu">Next Arrival</th>
             <th class="f6 fw6 ph3 pv2 tc ttu">Minutes Away</th>
+            <th class="f6 fw6 ph3 pv2 tc ttu">Action</th>
           </thead>
           <tbody>
-            
+            <!-- add data from firebase here -->
           </tbody>
         </table>
       </div>
     </section> 
     <section class="ba b--black-10 br3 center mb4">
-      <h1 class="bg-near-white black-60 br3 br--top f4 mv0 pv3 ph3"><span class="f2 mr1 v-mid">🚊</span> Add Train</h1>
+      <h1 class="bg-near-white black-60 br3 br--top f4 mv0 pv3 ph3"><span class="f2 mr1 v-mid">🚊</span> <span id="actionLabel">Add</span> Train</h1>
       <div class="pa3 bt b--black-10">
         <!-- uncomment next div once ready for production -->
         <div class="mb3">

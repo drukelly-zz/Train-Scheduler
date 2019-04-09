@@ -40,8 +40,51 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   dataRef.ref().on("child_added", (childSnapshot) => {
-    
-  })
+    // Target element to append data
+    let target = document.querySelector("tbody");
+    // Table row with a class name for zebra table look/feel
+    let tr = document.createElement("tr");
+    tr.classList.add("striped--near-white");
+    // Train name assembly
+    let cellTrain = document.createElement("td");
+    cellTrain.classList.add("f6", "fw6", "ph3", "pv2", "tl");
+    cellTrain.innerText = childSnapshot.val().train;
+    // Destination assembly
+    let cellDestination = document.createElement("td");
+    cellDestination.classList.add("f6", "fw6", "ph3", "pv2", "tc");
+    cellDestination.innerText = childSnapshot.val().destination;
+    // Frequency assembly
+    let cellFrequency = document.createElement("td");
+    cellFrequency.classList.add("f6", "fw6", "ph3", "pv2", "tc");
+    cellFrequency.innerText = childSnapshot.val().frequency;
+    // Next arrival assembly
+    let cellNext = document.createElement("td");
+    cellNext.classList.add("f6", "fw6", "ph3", "pv2", "tc");
+    cellNext.innerText = 1;
+    // Minutes away assembly
+    let cellMinsAway = document.createElement("td");
+    cellMinsAway.classList.add("f6", "fw6", "ph3", "pv2", "tc");
+    cellMinsAway.innerText = 1;
+    // Action buttons assembly
+    let cellActions = document.createElement("td");
+    let btnUpdate = document.createElement("a");
+    let btnRemove = document.createElement("a");
+    cellActions.classList.add("f6", "fw6", "ph3", "pv2", "tc");
+    btnUpdate.classList.add("ba", "bg-white", "black", "br-pill", "dib", "dim", "f6", "mb2", "mr2", "ph2", "pointer", "pv1", "white");
+    btnRemove.classList.add("ba", "bg-white", "black", "br-pill", "dib", "dim", "f6", "mb2", "ph2", "pointer", "pv1", "white");
+    btnUpdate.innerText = "✏️";
+    btnRemove.innerText = "❌";
+    cellActions.appendChild(btnUpdate);
+    cellActions.appendChild(btnRemove);
+    // Table definitions, assemble!
+    tr.appendChild(cellTrain);
+    tr.appendChild(cellDestination);
+    tr.appendChild(cellFrequency);
+    tr.appendChild(cellNext);
+    tr.appendChild(cellMinsAway);
+    tr.appendChild(cellActions);
+    target.appendChild(tr);
+  });
 
   // loadSampleData function
   // Make it easy to test the app
