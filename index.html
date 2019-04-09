@@ -13,11 +13,98 @@
   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
   <link rel="manifest" href="site.webmanifest">
-  <script src="https://www.gstatic.com/firebasejs/5.9.3/firebase.js"></script>
+  <!-- site.css -->
+  <link rel="stylesheet" href="assets/css/site.css">
+  <!-- firebase -->
+  <script src="https://www.gstatic.com/firebasejs/5.9.3/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/5.9.3/firebase-database.js"></script>
+  <!-- moment.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
 </head>
 
-<body>
-
+<body class="sans-serif">
+  <div class="pa4">
+    <section class="b--black-10 ba br3 center mb4">
+      <h1 class="bg-near-white black-60 br--top br3 f4 mv0 ph3 pv3">⏱ Current Train Schedule</h1>
+      <div class="b--black-10 bt pa3">
+        <table class="collapse ph3 pv2 w-100">
+          <thead class="striped--light-gray">
+            <th class="f6 fw6 ph3 pv2 tl ttu">Train Name</th>
+            <th class="f6 fw6 ph3 pv2 tl ttu">Destination</th>
+            <th class="f6 fw6 ph3 pv2 tc ttu">Frequency (min)</th>
+            <th class="f6 fw6 ph3 pv2 tc ttu">Next Arrival</th>
+            <th class="f6 fw6 ph3 pv2 tc ttu">Minutes Away</th>
+          </thead>
+          <tbody>
+            <tr class="striped--near-white">
+              <td class="f6 fw6 ph3 pv2 tl">1</td>
+              <td class="f6 fw6 ph3 pv2 tl">1</td>
+              <td class="f6 fw6 ph3 pv2 tc">1</td>
+              <td class="f6 fw6 ph3 pv2 tc">1</td>
+              <td class="f6 fw6 ph3 pv2 tc">1</td>
+            </tr>
+            <tr class="striped--near-white">
+              <td class="f6 fw6 ph3 pv2 tl">1</td>
+              <td class="f6 fw6 ph3 pv2 tl">1</td>
+              <td class="f6 fw6 ph3 pv2 tc">1</td>
+              <td class="f6 fw6 ph3 pv2 tc">1</td>
+              <td class="f6 fw6 ph3 pv2 tc">1</td>
+            </tr>
+            <tr class="striped--near-white">
+              <td class="f6 fw6 ph3 pv2 tl">1</td>
+              <td class="f6 fw6 ph3 pv2 tl">1</td>
+              <td class="f6 fw6 ph3 pv2 tc">1</td>
+              <td class="f6 fw6 ph3 pv2 tc">1</td>
+              <td class="f6 fw6 ph3 pv2 tc">1</td>
+            </tr>
+            <tr class="striped--near-white">
+              <td class="f6 fw6 ph3 pv2 tl">1</td>
+              <td class="f6 fw6 ph3 pv2 tl">1</td>
+              <td class="f6 fw6 ph3 pv2 tc">1</td>
+              <td class="f6 fw6 ph3 pv2 tc">1</td>
+              <td class="f6 fw6 ph3 pv2 tc">1</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+    <section class="ba b--black-10 br3 center mb4">
+      <h1 class="bg-near-white black-60 br3 br--top f4 mv0 pv3 ph3">🚇 Add Train</h1>
+      <div class="pa3 bt b--black-10">
+        <form class="black-80">
+          <div class="mb3">
+            <label for="trainName" class="b db f6 mb2">Train Name</label>
+            <input id="trainName" class="ba b--black-20 db input-reset mb2 pa2 w-100" type="text"
+              aria-describedby="name-desc">
+            <small id="name-desc" class="black-60 db f7 mb2">Enter the name of the train.</small>
+          </div>
+          <div class="mb3">
+            <label for="destination" class="b db f6 mb2">Destination</label>
+            <input id="destination" class="ba b--black-20 db input-reset mb2 pa2 w-100" type="text"
+              aria-describedby="destination-desc">
+            <small id="destination-desc" class="black-60 db f7 mb2">Enter the name of the destination.</small>
+          </div>
+          <div class="flex">
+            <div class="mb3 mr3 w-50">
+              <label for="firstTrainTime" class="b db f6 mb2">First Train Time</label>
+              <input id="firstTrainTime" class="ba b--black-20 db input-reset mb2 pa2 w-100" type="text"
+                aria-describedby="firstTrain-desc">
+              <small id="firstTrain-desc" class="black-60 db f7 mb2">First train time in 24-hr time format.</small>
+            </div>
+            <div class="mb3 w-50">
+              <label for="frequency" class="b db f6 mb2">Frequency</label>
+              <input id="frequency" class="ba b--black-20 db input-reset mb2 pa2 w-100" type="number"
+                aria-describedby="frequency-desc">
+              <small id="frequency-desc" class="black-60 db f7 mb2">Enter the interval in minutes.</small>
+            </div>
+          </div>
+          <button type="submit"
+            class="bg-dark-blue b--none br-pill dib dim f6 input-reset mb2 ph3 pointer pv2 white">Add Train</button>
+        </form>
+      </div>
+    </section>
+  </div>
+  <!-- app.js -->
   <script src="assets/js/app.js"></script>
 </body>
 
