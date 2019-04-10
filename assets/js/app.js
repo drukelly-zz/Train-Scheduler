@@ -11,6 +11,8 @@ document.addEventListener("DOMContentLoaded", () => {
   // Initialize Firebase App
   firebase.initializeApp(config);
   const firebaseDB = firebase.database();
+  // Set edit mode to false
+  let editMode = 0;
   // Set form DOM into a variable
   const form = document.querySelector("form");
   // Add train to DB
@@ -25,7 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (train == null || destination == null || firstTrainTime == null) {
       alert("Please fill out the required fields");
       return false;
-      // Otherwise, add to Firebase DB 
+      // Otherwise, add to Firebase DB
     } else {
       firebaseDB.ref().push({
         // Because of ES6 syntactic sugar,
@@ -45,16 +47,39 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   // Calculate minutes away
   const calcMinsAway = () => {
-    let minutesAway = moment().format("H:h");
+    let minutesAway = moment().format("HHhh");
     return minutesAway;
   }
   // Calculate next train
   const calcNextTrain = () => {
-    let currentTime = moment().format("H:h");
+    let currentTime = moment().format("HHhh");
     return currentTime;
   }
-  // Edit selected row function
-  const editEntry = (id) => {
+  // Edit entry function
+  const editTrain = () => {
+    // Capture input fields values
+    const train = document.querySelector("#trainName").value.trim();
+    const destination = document.querySelector("#destination").value.trim();
+    const dateAdded = document.querySelector("#dateAdded").value;
+    const firstTrainTime = document.querySelector("#firstTrainTime").value.trim();
+    const frequency = document.querySelector("#frequency").value.trim();
+    // Overwrite values per id, id being
+    // the specific key value called when clicked
+    firebaseDB.ref().child().set({
+      train,
+      destination,
+      firstTrainTime,
+      frequency,
+      dateAdded
+    });
+    setTimeout(() => {
+      resetForm();
+    }, 250);
+  }
+  // Load entry function
+  const loadEntry = (id) => {
+    editMode = 1;
+    document.querySelector("form").lastElementChild.setAttribute("id", "btn-editTrain");
     firebaseDB.ref().on("value", snapshot => {
       // Loop each entry and only return the matching key/id
       snapshot.forEach(childSnapshot => {
@@ -63,6 +88,7 @@ document.addEventListener("DOMContentLoaded", () => {
           actionLabels.forEach(actionLabel => {
             actionLabel.innerText = "Edit"
           });
+          if (editMode === 1) document.querySelector("#dateAdded").value = childSnapshot.val().dateAdded;
           document.querySelector("#trainName").value = childSnapshot.val().train;
           document.querySelector("#destination").value = childSnapshot.val().destination;
           document.querySelector("#firstTrainTime").value = childSnapshot.val().firstTrainTime;
@@ -98,14 +124,17 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     });
   }
-  // Reset Form
+  // Reset form function
   const resetForm = () => {
+    editMode = 0;
+    document.querySelector("form").lastElementChild.setAttribute("id", "btn-addTrain");
     document.querySelector("form").reset();
     let actionLabels = document.querySelectorAll(".actionLabel");
     actionLabels.forEach(actionLabel => {
       actionLabel.innerText = "Add"
     });
   }
+  // Button that's needed to trigger resetForm function
   document.querySelector("#btn-resetForm").addEventListener("click", (event) => {
     event.preventDefault();
     resetForm();
@@ -147,14 +176,16 @@ document.addEventListener("DOMContentLoaded", () => {
     btnRemove.classList.add("ba", "bg-white", "black", "br-pill", "dib", "dim", "f6", "mb2", "ph2", "pointer", "pv1", "white");
     btnUpdate.innerText = "✏️";
     btnRemove.innerText = "❌";
+    // Attach appropriate actions for each button
     btnUpdate.addEventListener("click", (event) => {
       event.preventDefault();
-      editEntry(event.target.parentNode.parentNode.id);
+      loadEntry(event.target.parentNode.parentNode.id);
     });
     btnRemove.addEventListener("click", (event) => {
       event.preventDefault();
       removeEntry(event.target.parentNode.parentNode.id, event.target);
     });
+    // Append buttons into table cell
     cellActions.appendChild(btnUpdate);
     cellActions.appendChild(btnRemove);
     // Table definitions, assemble!
@@ -166,8 +197,9 @@ document.addEventListener("DOMContentLoaded", () => {
     tr.appendChild(cellActions);
     target.appendChild(tr);
   });
-  // Attach function to button
+  // Load sample data when #btn-sampleData button is clicked
   document.querySelector("#btn-sampleData").addEventListener("click", (event) => {
+    event.preventDefault();
     loadSampleData();
   });
   // Prevent form from submitting; default behavior
@@ -178,4 +210,9 @@ document.addEventListener("DOMContentLoaded", () => {
   // Also works when user hits Enter/Return
   // because of button type="submit"
   document.querySelector("#btn-addTrain").addEventListener("click", addTrainToDB);
+  // On click handler for #btn-editTrain
+  // Also works when user hits Enter/Return
+  // because of button type="submit"
+  // Note: this particular line only works when `editMode` is true/1
+  if (editMode === 1) document.querySelector("#btn-editTrain").addEventListener("click", editTrain);
 });
