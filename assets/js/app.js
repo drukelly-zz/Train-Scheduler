@@ -85,11 +85,16 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelector("#frequency").value = frequencies[randomInt];
   }
   // Remove selected entry function
-  const removeEntry = (id) => {
+  const removeEntry = (id, element) => {
     firebaseDB.ref().on("value", snapshot => {
       // Loop each entry and only return the matching key/id
       snapshot.forEach(childSnapshot => {
-        childSnapshot.key === id ? console.log(id) : ""
+        if (childSnapshot.key === id) {
+          // Remove entry from the database
+          firebaseDB.ref().child(id).remove();
+          // Remove DOM
+          element.parentNode.parentNode.remove();
+        }
       });
     });
   }
@@ -138,7 +143,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let btnUpdate = document.createElement("a");
     let btnRemove = document.createElement("a");
     cellActions.classList.add("f6", "fw6", "ph3", "pv2", "tc");
-    btnUpdate.classList.add("ba", "bg-white", "black", "br-pill", "dib", "dim", "f6", "mb2", "mr2", "ph2", "pointer", "pv1", "white");
+    btnUpdate.classList.add("ba", "bg-white", "black", "br-pill", "dib", "dim", "f6", "mb2", "mr2-l", "ph2", "pointer", "pv1", "white");
     btnRemove.classList.add("ba", "bg-white", "black", "br-pill", "dib", "dim", "f6", "mb2", "ph2", "pointer", "pv1", "white");
     btnUpdate.innerText = "✏️";
     btnRemove.innerText = "❌";
@@ -148,7 +153,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     btnRemove.addEventListener("click", (event) => {
       event.preventDefault();
-      removeEntry(event.target.parentNode.parentNode.id);
+      removeEntry(event.target.parentNode.parentNode.id, event.target);
     });
     cellActions.appendChild(btnUpdate);
     cellActions.appendChild(btnRemove);
