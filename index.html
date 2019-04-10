@@ -43,13 +43,15 @@
       </div>
     </section> 
     <section class="ba b--black-10 br3 center mb4">
-      <h1 class="bg-near-white black-60 br3 br--top f4 mv0 pv3 ph3"><span class="f2 mr1 v-mid">🚊</span> <span id="actionLabel">Add</span> Train</h1>
+      <h1 class="bg-near-white black-60 br3 br--top f4 mv0 pv3 ph3"><span class="f2 mr1 v-mid">🚊</span> <span class="actionLabel">Add</span> Train</h1>
       <div class="pa3 bt b--black-10">
         <!-- uncomment next div once ready for production -->
         <div class="mb3">
           <button id="btn-sampleData" class="ba black br-pill dib dim f6 link mb2 ph3 pointer pv2">Load Sample Data</button>
+          <button id="btn-resetForm" class="ba black br-pill dib dim f6 link mb2 ph3 pointer pv2">Reset Form</button>
         </div>
         <form class="black-80">
+          <input type="hidden" id="dateAdded" name="dateAdded" value="">
           <div class="mb3">
             <label for="trainName" class="b db f6 mb2">Train Name</label>
             <input id="trainName" class="ba b--black-20 db input-reset mb2 pa2 w-100" type="text"
@@ -71,12 +73,12 @@
             </div>
             <div class="mb3 w-50">
               <label for="frequency" class="b db f6 mb2">Frequency</label>
-              <input id="frequency" class="ba b--black-20 db input-reset mb2 pa2 w-100" type="number"
+              <input id="frequency" class="ba b--black-20 db input-reset mb2 pa2 w-100" type="number" min="1"
                 aria-describedby="frequency-desc">
               <small id="frequency-desc" class="black-60 db f7 mb2">Enter the interval in minutes.</small>
             </div>
           </div>
-          <button id="btn-addTrain" type="submit" class="bg-dark-blue b--none br-pill dib dim f6 input-reset mb2 ph3 pointer pv2 white">Add Train</button>
+          <button id="btn-addTrain" type="submit" class="bg-dark-blue b--none br-pill dib dim f6 input-reset mb2 ph3 pointer pv2 white"><span class="actionLabel">Add</span> Train</button>
         </form>
       </div>
     </section>
