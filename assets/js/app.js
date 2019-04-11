@@ -53,7 +53,13 @@ document.addEventListener("DOMContentLoaded", () => {
     let startTime = moment(firstTrainTime)
                     .set("year", moment().get("year"))
                     .set("month", moment().get("month"))
-                    .set("date", moment().get("date"));
+                    .set("date", moment().get("date"))
+                    // Props to lishure!
+                    // https://github.com/lishure/Train-Scheduler/blob/1fd3c6f0e350d2de6bdbf8211cee7e06075778b6/assets/logic.js#L69
+                    // Need to substract 1 year for firstTrainTime
+                    // in reference to endTime/current time to
+                    // calculate properly
+                    .subtract(1, "years");
     // Get current time and assign it to endTime variable
     let endTime   = moment()
                     .set("year", moment().get("year"))
@@ -64,6 +70,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let duration  = moment
                       .duration(endTime.diff(startTime))
                       .asMinutes();
+        // Round up to the nearest minute
         duration  = Math.round(duration);
     // Take the duration with a modulo of the frequency
     // as the first order of operation. Then, take the remainder
