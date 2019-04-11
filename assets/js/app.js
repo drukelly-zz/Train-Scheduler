@@ -47,20 +47,36 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   // Calculate minutes away
   const calcMinsAway = (firstTrainTime, frequency) => {
-    let startTime = moment(firstTrainTime);
-    let endTime = moment().format("Hm");
-    let total = moment
-                  .duration(moment(endTime))
-                  .diff(startTime)
-                  .asHours();
-    let output = Math.abs((total % frequency) - frequency);
+    // Get startTime as the value of firstTrainTime
+    // with today's date. This is ideal for doing a diff
+    // between the startTime and current time, a.k.a. endTime
+    let startTime = moment(firstTrainTime)
+                    .set("year", moment().get("year"))
+                    .set("month", moment().get("month"))
+                    .set("date", moment().get("date"));
+    // Get current time and assign it to endTime variable
+    let endTime   = moment()
+                    .set("year", moment().get("year"))
+                    .set("month", moment().get("month"))
+                    .set("date", moment().get("date"));
+    // Calculate duration between the startTime and endTime
+    // and get total as minutes
+    let duration  = moment
+                      .duration(endTime.diff(startTime))
+                      .asMinutes();
+        duration  = Math.round(duration);
+    // Take the duration with a modulo of the frequency
+    // as the first order of operation. Then, take the remainder
+    // and subtract from the frequency. An absolute value will
+    // ensure a positive value always
+    let output = Math.abs((duration % frequency) - frequency);
     return output;
   }
   // Calculate next train
   const calcNextTrain = (firstTrainTime, frequency) => {
-    let currentTime = moment().format("Hm");
-    let output = `${firstTrainTime} ${frequency}`;
-    return output;
+    let currentTime = moment();
+    let minutesToAdd = calcMinsAway(firstTrainTime, frequency);
+    return currentTime.add(minutesToAdd, "m").format("HH:mm");
   }
   // Edit entry function
   const editTrain = () => {
@@ -171,6 +187,7 @@ document.addEventListener("DOMContentLoaded", () => {
     event.preventDefault();
     resetForm();
   });
+  // Update table function
   const updateTable = () => {
     // Empty existing entries
     document.querySelector("tbody").innerHTML = "";
