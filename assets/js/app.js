@@ -267,4 +267,6 @@ document.addEventListener("DOMContentLoaded", () => {
   resetForm();
   // On load, update the table
   updateTable();
+  // Update the table every minute
+  setInterval(updateTable, 60 * 1000);
 });
