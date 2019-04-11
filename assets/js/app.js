@@ -11,8 +11,6 @@ document.addEventListener("DOMContentLoaded", () => {
   // Initialize Firebase App
   firebase.initializeApp(config);
   const firebaseDB = firebase.database();
-  // Set edit mode to false
-  let editMode = 0;
   // Set form DOM into a variable
   const form = document.querySelector("form");
   // Add train to DB
@@ -31,7 +29,8 @@ document.addEventListener("DOMContentLoaded", () => {
     } else {
       firebaseDB.ref().push({
         // Because of ES6 syntactic sugar,
-        // key value pair can be abbreviated
+        // key value pairs can be abbreviated
+        // when the key is equal to the value,
         // i.e. train === train: train
         train,
         destination,
@@ -39,6 +38,7 @@ document.addEventListener("DOMContentLoaded", () => {
         frequency,
         dateAdded: firebase.database.ServerValue.TIMESTAMP
       });
+      updateTable();
       // Clear the form after 250ms
       setTimeout(() => {
         resetForm()
@@ -46,14 +46,21 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
   // Calculate minutes away
-  const calcMinsAway = () => {
-    let minutesAway = moment().format("HHhh");
-    return minutesAway;
+  const calcMinsAway = (firstTrainTime, frequency) => {
+    let startTime = moment(firstTrainTime);
+    let endTime = moment().format("Hm");
+    let total = moment
+                  .duration(moment(endTime))
+                  .diff(startTime)
+                  .asHours();
+    let output = Math.abs((total % frequency) - frequency);
+    return output;
   }
   // Calculate next train
-  const calcNextTrain = () => {
-    let currentTime = moment().format("HHhh");
-    return currentTime;
+  const calcNextTrain = (firstTrainTime, frequency) => {
+    let currentTime = moment().format("Hm");
+    let output = `${firstTrainTime} ${frequency}`;
+    return output;
   }
   // Edit entry function
   const editTrain = () => {
@@ -63,9 +70,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const dateAdded = document.querySelector("#dateAdded").value;
     const firstTrainTime = document.querySelector("#firstTrainTime").value.trim();
     const frequency = document.querySelector("#frequency").value.trim();
+    const childKey = document.querySelector("#key").value;
     // Overwrite values per id, id being
     // the specific key value called when clicked
-    firebaseDB.ref().child().set({
+    firebaseDB.ref().child(childKey).set({
       train,
       destination,
       firstTrainTime,
@@ -75,11 +83,31 @@ document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => {
       resetForm();
     }, 250);
+    updateTable();
+  }
+  const hideAddButton = () => {
+    document.querySelector("#btn-addTrain").classList.remove("dib");
+    document.querySelector("#btn-addTrain").classList.add("dn");
+  }
+  const hideEditButton = () => {
+    document.querySelector("#btn-editTrain").classList.remove("dib");
+    document.querySelector("#btn-editTrain").classList.add("dn");
+  }
+  const showAddButton = () => {
+    document.querySelector("#btn-addTrain").classList.add("dib");
+    document.querySelector("#btn-addTrain").classList.remove("dn");
+  }
+  const showEditButton = () => {
+    document.querySelector("#btn-editTrain").classList.add("dib");
+    document.querySelector("#btn-editTrain").classList.remove("dn");
   }
   // Load entry function
   const loadEntry = (id) => {
-    editMode = 1;
-    document.querySelector("form").lastElementChild.setAttribute("id", "btn-editTrain");
+    // Hide #btn-addTrain
+    hideAddButton();
+    // Show #btn-editTrain
+    showEditButton();
+    // Load Firebase entries for keys
     firebaseDB.ref().on("value", snapshot => {
       // Loop each entry and only return the matching key/id
       snapshot.forEach(childSnapshot => {
@@ -88,7 +116,8 @@ document.addEventListener("DOMContentLoaded", () => {
           actionLabels.forEach(actionLabel => {
             actionLabel.innerText = "Edit"
           });
-          if (editMode === 1) document.querySelector("#dateAdded").value = childSnapshot.val().dateAdded;
+          document.querySelector("#dateAdded").value = childSnapshot.val().dateAdded;
+          document.querySelector("#key").value = childSnapshot.key;
           document.querySelector("#trainName").value = childSnapshot.val().train;
           document.querySelector("#destination").value = childSnapshot.val().destination;
           document.querySelector("#firstTrainTime").value = childSnapshot.val().firstTrainTime;
@@ -97,7 +126,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     });
   }
-  // loadSampleData function
+  // Load sample data function
   // Make it easy to test the app
   const trains = ["Snowpiercer", "Polar Express", "Thomas The Train", "BART", "Orient Express"];
   const destinations = ["Chris Evans", "North Pole", "Train Depot", "SFO Airport", "Somewhere"];
@@ -123,80 +152,87 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       });
     });
+    resetForm();
   }
   // Reset form function
   const resetForm = () => {
-    editMode = 0;
-    document.querySelector("form").lastElementChild.setAttribute("id", "btn-addTrain");
     document.querySelector("form").reset();
+    document.querySelector("#key").value = "";
+    document.querySelector("#dateAdded").value = "";
     let actionLabels = document.querySelectorAll(".actionLabel");
     actionLabels.forEach(actionLabel => {
       actionLabel.innerText = "Add"
     });
+    showAddButton();
+    hideEditButton();
   }
   // Button that's needed to trigger resetForm function
   document.querySelector("#btn-resetForm").addEventListener("click", (event) => {
     event.preventDefault();
     resetForm();
   });
-  // Firebase method to load data onto DOM
-  firebaseDB.ref().on("child_added", (childSnapshot) => {
-    // Target element to append data
-    let target = document.querySelector("tbody");
-    // Table row with a class name for zebra table look/feel
-    let tr = document.createElement("tr");
-    tr.classList.add("striped--near-white");
-    tr.setAttribute("id", childSnapshot.key);
-    // Train name assembly
-    let cellTrain = document.createElement("td");
-    cellTrain.classList.add("f6", "fw6", "ph3", "pv2", "tl");
-    cellTrain.innerText = childSnapshot.val().train;
-    // Destination assembly
-    let cellDestination = document.createElement("td");
-    cellDestination.classList.add("f6", "fw6", "ph3", "pv2", "tc");
-    cellDestination.innerText = childSnapshot.val().destination;
-    // Frequency assembly
-    let cellFrequency = document.createElement("td");
-    cellFrequency.classList.add("f6", "fw6", "ph3", "pv2", "tc");
-    cellFrequency.innerText = childSnapshot.val().frequency;
-    // Next arrival assembly
-    let cellNext = document.createElement("td");
-    cellNext.classList.add("f6", "fw6", "ph3", "pv2", "tc");
-    cellNext.innerText = calcNextTrain();
-    // Minutes away assembly
-    let cellMinsAway = document.createElement("td");
-    cellMinsAway.classList.add("f6", "fw6", "ph3", "pv2", "tc");
-    cellMinsAway.innerText = calcMinsAway();
-    // Action buttons assembly
-    let cellActions = document.createElement("td");
-    let btnUpdate = document.createElement("a");
-    let btnRemove = document.createElement("a");
-    cellActions.classList.add("f6", "fw6", "ph3", "pv2", "tc");
-    btnUpdate.classList.add("ba", "bg-white", "black", "br-pill", "dib", "dim", "f6", "mb2", "mr2-l", "ph2", "pointer", "pv1", "white");
-    btnRemove.classList.add("ba", "bg-white", "black", "br-pill", "dib", "dim", "f6", "mb2", "ph2", "pointer", "pv1", "white");
-    btnUpdate.innerText = "✏️";
-    btnRemove.innerText = "❌";
-    // Attach appropriate actions for each button
-    btnUpdate.addEventListener("click", (event) => {
-      event.preventDefault();
-      loadEntry(event.target.parentNode.parentNode.id);
+  const updateTable = () => {
+    // Empty existing entries
+    document.querySelector("tbody").innerHTML = "";
+    // Firebase method to load data onto DOM
+    firebaseDB.ref().on("child_added", (childSnapshot) => {
+      // Target element to append data
+      let target = document.querySelector("tbody");
+      // Table row with a class name for zebra table look/feel
+      let tr = document.createElement("tr");
+      tr.classList.add("striped--near-white");
+      tr.setAttribute("id", childSnapshot.key);
+      // Train name assembly
+      let cellTrain = document.createElement("td");
+      cellTrain.classList.add("f6", "fw6", "ph3", "pv2", "tl");
+      cellTrain.innerText = childSnapshot.val().train;
+      // Destination assembly
+      let cellDestination = document.createElement("td");
+      cellDestination.classList.add("f6", "fw6", "ph3", "pv2", "tc");
+      cellDestination.innerText = childSnapshot.val().destination;
+      // Frequency assembly
+      let cellFrequency = document.createElement("td");
+      cellFrequency.classList.add("f6", "fw6", "ph3", "pv2", "tc");
+      cellFrequency.innerText = childSnapshot.val().frequency;
+      // Next arrival assembly
+      let cellNext = document.createElement("td");
+      cellNext.classList.add("f6", "fw6", "ph3", "pv2", "tc");
+      cellNext.innerText = calcNextTrain(childSnapshot.val().firstTrainTime, childSnapshot.val().frequency);
+      // Minutes away assembly
+      let cellMinsAway = document.createElement("td");
+      cellMinsAway.classList.add("f6", "fw6", "ph3", "pv2", "tc");
+      cellMinsAway.innerText = calcMinsAway(childSnapshot.val().firstTrainTime, childSnapshot.val().frequency);
+      // Action buttons assembly
+      let cellActions = document.createElement("td");
+      let btnUpdate = document.createElement("a");
+      let btnRemove = document.createElement("a");
+      cellActions.classList.add("db-l", "dn", "f6", "fw6", "ph3", "pv2", "tc");
+      btnUpdate.classList.add("ba", "bg-white", "black", "br-pill", "dib", "dim", "f6", "mb2", "mr2-l", "ph2", "pointer", "pv1", "white");
+      btnRemove.classList.add("ba", "bg-white", "black", "br-pill", "dib", "dim", "f6", "mb2", "ph2", "pointer", "pv1", "white");
+      btnUpdate.innerText = "✏️";
+      btnRemove.innerText = "❌";
+      // Attach appropriate actions for each button
+      btnUpdate.addEventListener("click", (event) => {
+        event.preventDefault();
+        loadEntry(event.target.parentNode.parentNode.id);
+      });
+      btnRemove.addEventListener("click", (event) => {
+        event.preventDefault();
+        removeEntry(event.target.parentNode.parentNode.id, event.target);
+      });
+      // Append buttons into table cell
+      cellActions.appendChild(btnUpdate);
+      cellActions.appendChild(btnRemove);
+      // Table definitions, assemble!
+      tr.appendChild(cellTrain);
+      tr.appendChild(cellDestination);
+      tr.appendChild(cellFrequency);
+      tr.appendChild(cellNext);
+      tr.appendChild(cellMinsAway);
+      tr.appendChild(cellActions);
+      target.appendChild(tr);
     });
-    btnRemove.addEventListener("click", (event) => {
-      event.preventDefault();
-      removeEntry(event.target.parentNode.parentNode.id, event.target);
-    });
-    // Append buttons into table cell
-    cellActions.appendChild(btnUpdate);
-    cellActions.appendChild(btnRemove);
-    // Table definitions, assemble!
-    tr.appendChild(cellTrain);
-    tr.appendChild(cellDestination);
-    tr.appendChild(cellFrequency);
-    tr.appendChild(cellNext);
-    tr.appendChild(cellMinsAway);
-    tr.appendChild(cellActions);
-    target.appendChild(tr);
-  });
+  }
   // Load sample data when #btn-sampleData button is clicked
   document.querySelector("#btn-sampleData").addEventListener("click", (event) => {
     event.preventDefault();
@@ -207,12 +243,11 @@ document.addEventListener("DOMContentLoaded", () => {
     event.preventDefault();
   })
   // On click handler for #btn-addTrain
-  // Also works when user hits Enter/Return
-  // because of button type="submit"
   document.querySelector("#btn-addTrain").addEventListener("click", addTrainToDB);
   // On click handler for #btn-editTrain
-  // Also works when user hits Enter/Return
-  // because of button type="submit"
-  // Note: this particular line only works when `editMode` is true/1
-  if (editMode === 1) document.querySelector("#btn-editTrain").addEventListener("click", editTrain);
+  document.querySelector("#btn-editTrain").addEventListener("click", editTrain);
+  // On load, reset the form
+  resetForm();
+  // On load, update the table
+  updateTable();
 });

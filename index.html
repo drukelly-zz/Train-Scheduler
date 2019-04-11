@@ -24,17 +24,17 @@
 
 <body class="sans-serif">
   <div class="pa4">
-    <section class="b--black-10 ba br3 center mb4">
+    <section class="b--black-10 ba br3 center mb3">
       <h1 class="bg-near-white black-60 br--top br3 f4 mv0 ph3 pv3"><span class="f2 mr1 v-mid">⏱</span> Current Train Schedule</h1>
-      <div class="b--black-10 bt pa3">
-        <table class="b--black-10 ba collapse ph3 pv2 w-100">
+      <div class="b--black-10 nowrap overflow-x-auto mr3 mr0-ns pa3">
+        <table class="b--black-10 ba collapse mb2 mb0-ns ph3 pv2 w-100">
           <thead class="striped--light-gray">
             <th class="f6 fw6 ph3 pv2 tl ttu">Train Name</th>
             <th class="f6 fw6 ph3 pv2 tc ttu">Destination</th>
-            <th class="f6 fw6 ph3 pv2 tc ttu">Frequency (min)</th>
+            <th class="f6 fw6 ph3 pv2 tc ttu">Frequency In Minutes</th>
             <th class="f6 fw6 ph3 pv2 tc ttu">Next Arrival</th>
             <th class="f6 fw6 ph3 pv2 tc ttu">Minutes Away</th>
-            <th class="f6 fw6 ph3 pv2 tc ttu">Action</th>
+            <th class="f6 fw6 ph3 pv2 tc ttu dn db-l">Action</th>
           </thead>
           <tbody>
             <!-- add data from firebase here -->
@@ -42,15 +42,16 @@
         </table>
       </div>
     </section> 
-    <section class="ba b--black-10 br3 center mb4">
+    <section class="ba b--black-10 br3 center">
       <h1 class="bg-near-white black-60 br3 br--top f4 mv0 pv3 ph3"><span class="f2 mr1 v-mid">🚊</span> <span class="actionLabel">Add</span> Train</h1>
-      <div class="pa3 bt b--black-10">
+      <div class="pa3 b--black-10">
         <!-- uncomment next div once ready for production -->
         <div class="mb3">
           <button id="btn-sampleData" class="ba black br-pill dib dim f6 link mb2 ph3 pointer pv2">Load Sample Data</button>
           <button id="btn-resetForm" class="ba black br-pill dib dim f6 link mb2 ph3 pointer pv2">Reset Form</button>
         </div>
         <form class="black-80">
+          <input type="hidden" id="key" name="key" value="">
           <input type="hidden" id="dateAdded" name="dateAdded" value="">
           <div class="mb3">
             <label for="trainName" class="b db f6 mb2">Train Name</label>
@@ -78,7 +79,8 @@
               <small id="frequency-desc" class="black-60 db f7 mb2">Enter the interval in minutes.</small>
             </div>
           </div>
-          <button id="btn-addTrain" type="submit" class="bg-dark-blue b--none br-pill dib dim f6 input-reset mb2 ph3 pointer pv2 white"><span class="actionLabel">Add</span> Train</button>
+          <button id="btn-addTrain" type="button" class="bg-dark-blue b--none br-pill dib dim f6 input-reset mb2 ph3 pointer pv2 white">Add Train</button>
+          <button id="btn-editTrain" type="button" class="bg-dark-blue b--none br-pill dib dim f6 input-reset mb2 ph3 pointer pv2 white">Edit Train</button>
         </form>
       </div>
     </section>
